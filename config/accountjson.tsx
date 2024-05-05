@@ -45,7 +45,7 @@ export const AccountFormSelectJSON = [
   {
     name: "role_name",
     label: "Role",
-    placeholder: "Role",
+    placeholder: "Select Role",
     content: [
       {
         name: "Admin",
@@ -64,7 +64,7 @@ export const AccountFormSelectJSON = [
   {
     name: "status",
     label: "Status",
-    placeholder: "Status",
+    placeholder: "Select Status",
     content: [
       {
         name: "Active",
@@ -75,5 +75,24 @@ export const AccountFormSelectJSON = [
         value: "inactive",
       },
     ],
+  },
+];
+
+export const AccountTableData = [
+  {
+    name: "Arunkumar",
+    username: "arun",
+    email: "arun@gmail.com",
+    mobile: "1234567890",
+    role_name: "Admin",
+    status: "Active",
+  },
+  {
+    name: "kumar",
+    username: "Kumar",
+    email: "kumar@gmail.com",
+    mobile: "1234567890",
+    role_name: "Admin",
+    status: "Active",
   },
 ];

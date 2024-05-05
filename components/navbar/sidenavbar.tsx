@@ -8,7 +8,7 @@ import SideNavbarTabs from "./sidenavbartabs";
 const SideNavbar = () => {
   const [isCollapsible, setIsCollapsible] = useState(false);
   const wrapperClass = classNames("h-full border-r border-2 px-4 py-2", {
-    ["w-80"]: !isCollapsible,
+    ["w-60"]: !isCollapsible,
     "w-[70px]": isCollapsible,
   });
 
