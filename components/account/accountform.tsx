@@ -1,4 +1,3 @@
-import { UserSchema } from "@/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -25,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { UserSchema } from "@/schema";
 
 const AccountForm = () => {
   const form = useForm<z.infer<typeof UserSchema>>({
@@ -53,8 +53,7 @@ const AccountForm = () => {
       <Form {...form}>
         <form
           className="w-full h-full bg-white p-2 text-sm"
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
+          onSubmit={form.handleSubmit(onSubmit)}>
           <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2">
             {/* form values */}
             {AccountFormJSON.map((data, index) => {
@@ -66,7 +65,9 @@ const AccountForm = () => {
                   render={({ field }) => {
                     return (
                       <FormItem>
-                        <FormLabel className="font-light">{data.label}</FormLabel>
+                        <FormLabel className="font-light">
+                          {data.label}
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="text"
@@ -91,16 +92,16 @@ const AccountForm = () => {
                   render={({ field }) => {
                     return (
                       <FormItem>
-                        <FormLabel className="font-light">{data.label}</FormLabel>
+                        <FormLabel className="font-light">
+                          {data.label}
+                        </FormLabel>
                         <Select
                           onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
+                          defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue
-                                placeholder={data.placeholder}
-                              ></SelectValue>
+                                placeholder={data.placeholder}></SelectValue>
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -131,8 +132,7 @@ const AccountForm = () => {
               onClick={() => {
                 form.clearErrors();
                 form.reset();
-              }}
-            >
+              }}>
               Clear
               <IoMdCloseCircle className="ml-2 text-black" size={20} />
             </Button>
