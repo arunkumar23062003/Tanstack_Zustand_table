@@ -20,6 +20,8 @@ import {
   MdKeyboardDoubleArrowRight,
   MdRefresh,
 } from "react-icons/md";
+import jspdf from "jspdf";
+import autoTable from "jspdf-autotable";
 
 import {
   Table,
@@ -48,6 +50,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ExportButtonComponent from "./exportbuttoncomponent";
+import * as XLSX from "xlsx";
 
 interface DataTableProps<TData, TValue> {
   data: TData[];
@@ -68,7 +71,7 @@ const DataTable = <TData, TValue>({
   const [exportFileName, setExportFilName] = useState<string>(
     `${fileName} - ${new Date().toISOString()}`
   );
-  console.log(exportFileName);
+  // console.log(exportFileName);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 5,
@@ -99,8 +102,7 @@ const DataTable = <TData, TValue>({
     },
   });
 
-  // console.log(table.getPageCount());
-
+  //csv file
   const exportCSV = (value: any) => {
     // console.log(value);
     const newData: any = [];
@@ -111,7 +113,55 @@ const DataTable = <TData, TValue>({
         updatedDate: updatedDate?.toString().replaceAll(",", "/"),
       });
     });
-    console.log(newData);
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      newData.map((row: any) => Object.values(row).join(",")).join("\n");
+    const encodeUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodeUri);
+    link.setAttribute("download", `${exportFileName}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    // console.log(newData);
+  };
+
+  const exportPDF = (value: any) => {
+    const headerList = Object.keys(value[0]);
+    const header: any = [[]];
+    const body: any = [];
+    headerList.map((info: string, index) => {
+      header[0].push(
+        `${
+          info.replaceAll("_", " ").charAt(0).toUpperCase() +
+          info
+            .replaceAll("_", " ")
+            .slice(1)
+            .replace(/([a-z])([A-Z])/g, "$1 $2")
+        }`
+      );
+    });
+    value.map((info: any, index: any) => {
+      if (index > 0) {
+        return body.push(Object.values(info));
+      }
+    });
+    const doc = new jspdf({ orientation: "landscape" });
+    autoTable(doc, {
+      head: header,
+      body: body,
+      theme: "grid",
+    });
+    doc.save(exportFileName + ".pdf");
+  };
+
+  const exportXLSX = (data: any) => {
+    var workbook = XLSX.utils.book_new();
+    const header = Object.values(data[0]);
+    const body: any = [];
+    data.map((info: any, index: number) => body.push(Object.values(info)));
+    var worksheet = XLSX.utils.aoa_to_sheet([header, ...body.slice(1)]);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, `${exportFileName}` + ".xlsx");
   };
 
   const exportData = (value: string, dataFields: string[]) => {
@@ -133,6 +183,12 @@ const DataTable = <TData, TValue>({
     });
     if (value === "CSV") {
       exportCSV(exportData);
+    }
+    if (value === "PDF") {
+      exportPDF(exportData);
+    }
+    if (value === "XLSX") {
+      exportXLSX(exportData);
     }
   };
 
