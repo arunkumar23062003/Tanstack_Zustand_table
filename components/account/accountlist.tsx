@@ -10,6 +10,7 @@ import {
 import { headers } from "next/headers";
 import DataTable from "../common/datatable";
 import { columns } from "./column";
+import { userController } from "@/config/const";
 
 const columnHelper = createColumnHelper<tData>();
 
@@ -86,7 +87,12 @@ const AccountList = () => {
     //   </tbody>
     // </table>
     <div className="bg-white">
-      <DataTable data={data} columns={columns} />
+      <DataTable
+        data={data}
+        columns={columns}
+        fileName="Users"
+        exportDataFields={userController}
+      />
     </div>
   );
 };

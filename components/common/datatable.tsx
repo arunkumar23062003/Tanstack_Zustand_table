@@ -47,23 +47,32 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import ExportButtonComponent from "./exportbuttoncomponent";
 
 interface DataTableProps<TData, TValue> {
   data: TData[];
   columns: ColumnDef<TData, TValue>[];
+  fileName: string;
+  exportDataFields: string[];
 }
 
 const DataTable = <TData, TValue>({
   data,
   columns,
+  fileName,
+  exportDataFields,
 }: DataTableProps<TData, TValue>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibilty] = useState<VisibilityState>({});
-  // const [pagination, setPagination] = useState({
-  //   pageIndex: 0,
-  //   pageSize: 5,
-  // });
+  const [exportFileName, setExportFilName] = useState<string>(
+    `${fileName} - ${new Date().toISOString()}`
+  );
+  console.log(exportFileName);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 5,
+  });
   React.useState<VisibilityState>({});
   const paginationArray = [5, 10, 20, 30, 40];
 
@@ -74,7 +83,7 @@ const DataTable = <TData, TValue>({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    // onPaginationChange: setPagination,
+    onPaginationChange: setPagination,
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
@@ -86,11 +95,46 @@ const DataTable = <TData, TValue>({
       columnFilters,
       columnVisibility,
       rowSelection,
-      // pagination,
+      pagination,
     },
   });
 
   // console.log(table.getPageCount());
+
+  const exportCSV = (value: any) => {
+    // console.log(value);
+    const newData: any = [];
+    value.map(({ createdDate, updatedDate, ...info }: any) => {
+      return newData.push({
+        ...info,
+        createdDate: createdDate?.toString().replaceAll(",", "/"),
+        updatedDate: updatedDate?.toString().replaceAll(",", "/"),
+      });
+    });
+    console.log(newData);
+  };
+
+  const exportData = (value: string, dataFields: string[]) => {
+    const exportData = [];
+    let obj1: any = {};
+    dataFields.map(
+      (field) =>
+        (obj1[field] =
+          field.replaceAll("_", " ").charAt(0).toUpperCase() +
+          field.replaceAll("_", " ").slice(1))
+    );
+    exportData.push(obj1);
+    data.map((info: any) => {
+      let obj2: any = {};
+      dataFields.map((field) => {
+        obj2[field] = info[`${field}`];
+      });
+      exportData.push(obj2);
+    });
+    if (value === "CSV") {
+      exportCSV(exportData);
+    }
+  };
 
   return (
     <div className="w-full p-2">
@@ -124,7 +168,38 @@ const DataTable = <TData, TValue>({
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent></DropdownMenuContent>
+          <DropdownMenuContent className="flex flex-col gap-2">
+            <ExportButtonComponent
+              label="CSV"
+              exportFileName={exportFileName}
+              nameChangeFunction={setExportFilName}
+              data={data}
+              exportFunction={(value: string[]) => {
+                exportData("CSV", value);
+              }}
+              exportDataFields={exportDataFields}
+            />
+            <ExportButtonComponent
+              label="PDF"
+              exportFileName={exportFileName}
+              nameChangeFunction={setExportFilName}
+              data={data}
+              exportFunction={(value: string[]) => {
+                exportData("PDF", value);
+              }}
+              exportDataFields={exportDataFields}
+            />
+            <ExportButtonComponent
+              label="XLSX"
+              exportFileName={exportFileName}
+              nameChangeFunction={setExportFilName}
+              data={data}
+              exportFunction={(value: string[]) => {
+                exportData("XLSX", value);
+              }}
+              exportDataFields={exportDataFields}
+            />
+          </DropdownMenuContent>
         </DropdownMenu>
 
         <DropdownMenu>
