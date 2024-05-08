@@ -12,7 +12,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import {
@@ -80,6 +80,8 @@ const DataTable = <TData, TValue>({
   const paginationArray = [5, 10, 20, 30, 40];
 
   const [rowSelection, setRowSelection] = useState({});
+
+  console.log(data);
 
   const table = useReactTable({
     data,
@@ -191,6 +193,8 @@ const DataTable = <TData, TValue>({
       exportXLSX(exportData);
     }
   };
+
+  // console.log(data);
 
   return (
     <div className="w-full p-2">
@@ -314,6 +318,7 @@ const DataTable = <TData, TValue>({
               </TableRow>
             ) : (
               table.getRowModel().rows.map((row) => {
+                // console.log(row);
                 return (
                   <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (

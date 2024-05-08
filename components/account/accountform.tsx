@@ -12,7 +12,11 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { AccountFormJSON, AccountFormSelectJSON } from "@/config/accountjson";
+import {
+  AccountFormJSON,
+  AccountFormSelectJSON,
+  AccountTableData,
+} from "@/config/accountjson";
 import { Button } from "../ui/button";
 
 import { FaUser } from "react-icons/fa";
@@ -25,8 +29,10 @@ import {
   SelectValue,
 } from "../ui/select";
 import { UserSchema } from "@/schema";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const AccountForm = () => {
+  const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof UserSchema>>({
     resolver: zodResolver(UserSchema),
     defaultValues: {
@@ -40,10 +46,33 @@ const AccountForm = () => {
     },
   });
 
+  const createUser = useMutation({
+    mutationFn: async (value: any) => {
+      const newUser = {
+        name: value.name,
+        username: value.username,
+        email: value.email,
+        mobile: value.mobile,
+        role_name: value.role_name,
+        status: value.status,
+      };
+      AccountTableData.push(newUser);
+      return AccountTableData;
+    },
+    onSuccess: (value: any) => {
+      console.log(value);
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (value: any) => {
+      console.log("error");
+    },
+  });
+
   const onSubmit = (values: z.infer<typeof UserSchema>) => {
-    console.log("hi");
-    alert(values);
-    console.log(values);
+    // console.log("hi");
+    // alert(values);
+    // console.log(values);
+    createUser.mutate(values);
     form.clearErrors();
     form.reset();
   };

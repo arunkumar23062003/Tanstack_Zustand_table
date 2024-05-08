@@ -1,3 +1,4 @@
+"use client";
 import { AccountTableData } from "@/config/accountjson";
 import { tData } from "@/types";
 import {
@@ -11,10 +12,12 @@ import { headers } from "next/headers";
 import DataTable from "../common/datatable";
 import { columns } from "./column";
 import { userController } from "@/config/const";
+import { useQuery } from "@tanstack/react-query";
+import { MdFreeBreakfast } from "react-icons/md";
 
 const columnHelper = createColumnHelper<tData>();
 
-const data: tData[] = AccountTableData;
+// const data: tData[] = AccountTableData;
 
 // const columns = [
 //   columnHelper.accessor("name", {
@@ -48,6 +51,27 @@ const AccountList = () => {
   //   columns,
   //   getCoreRowModel: getCoreRowModel(),
   // });
+
+  const fetchUsers = () => {
+    return AccountTableData;
+  };
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      return fetchUsers();
+    },
+  });
+  const breaks: tData[] | undefined = data;
+  // console.log(breaks);
+
+  if (isLoading && breaks === undefined) {
+    return <div>Loading</div>;
+  }
+
+  if (isError) {
+    return <div>Error</div>;
+  }
   return (
     // <table className="">
     //   <thead>
@@ -86,13 +110,20 @@ const AccountList = () => {
     //     })}
     //   </tbody>
     // </table>
+
     <div className="bg-white">
-      <DataTable
-        data={data}
-        columns={columns}
-        fileName="Users"
-        exportDataFields={userController}
-      />
+      {isLoading ? (
+        <div className="flex w-full h-full justify-center items-center">
+          Loading
+        </div>
+      ) : (
+        <DataTable
+          data={breaks!}
+          columns={columns}
+          fileName="Users"
+          exportDataFields={userController}
+        />
+      )}
     </div>
   );
 };
