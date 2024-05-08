@@ -212,6 +212,7 @@ const DataTable = <TData, TValue>({
           variant={"secondary"}
           onClick={() => {
             table.resetColumnVisibility();
+            table.resetSorting();
             table.resetRowSelection();
             table.resetColumnFilters();
             table.resetPagination();
@@ -286,6 +287,25 @@ const DataTable = <TData, TValue>({
                   </DropdownMenuCheckboxItem>
                 );
               })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant={"outline"} className="mr-2">
+              Sort
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <div className="w-full flex flex-col gap-2 py-2 items-center">
+              <p
+                onClick={() => table.setSorting([{ id: "name", desc: false }])}>
+                Sort A-Z
+              </p>
+              <p onClick={() => table.setSorting([{ id: "name", desc: true }])}>
+                Sort Z-A
+              </p>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
