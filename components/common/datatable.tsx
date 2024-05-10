@@ -152,6 +152,13 @@ const DataTable = <TData, TValue>({
       head: header,
       body: body,
       theme: "grid",
+      columnStyles: {
+        // Apply cell width as wrap for all columns
+        ...Object.keys(value[0]).reduce((acc: any, key: string) => {
+          acc[key] = { cellWidth: "wrap" };
+          return acc;
+        }, {}),
+      },
     });
     doc.save(exportFileName + ".pdf");
   };
