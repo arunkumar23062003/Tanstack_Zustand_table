@@ -22,6 +22,7 @@ export async function PUT(request: Request, id: { params: { id: string } }) {
     await getUserById(id.params.id);
     const body = await request.json();
     const { name, username, email, password, mobile, role_name, status } = body;
+    console.log(name, username, email, password, mobile, role_name, status);
 
     const updatedUser = await db.user.update({
       where: { id: id.params.id },

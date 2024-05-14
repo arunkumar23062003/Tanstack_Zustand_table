@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { z } from "zod";
@@ -30,9 +30,14 @@ import {
 } from "../ui/select";
 import { UserSchema } from "@/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useStore } from "@/state";
+import { toast } from "sonner";
 
 const AccountForm = () => {
   const queryClient = useQueryClient();
+  const user = useStore((state: any) => state.user);
+  const removeUser = useStore((state: any) => state.removeUser);
   const form = useForm<z.infer<typeof UserSchema>>({
     resolver: zodResolver(UserSchema),
     defaultValues: {
@@ -42,40 +47,46 @@ const AccountForm = () => {
       password: "",
       mobile: "",
       role_name: "",
-      status: "",
     },
   });
 
-  const createUser = useMutation({
-    mutationFn: async (value: any) => {
-      const newUser = {
-        name: value.name,
-        username: value.username,
-        email: value.email,
-        mobile: value.mobile,
-        role_name: value.role_name,
-        status: value.status,
-      };
-      AccountTableData.push(newUser);
-      return AccountTableData;
+  const createuser = useMutation({
+    mutationFn: async (val: any) => {
+      const response = user
+        ? await axios.put(`/api/register/${user.id}`, val)
+        : await axios.post("/api/register", val);
+      removeUser();
+      return response.data;
     },
-    onSuccess: (value: any) => {
-      console.log(value);
+    onSuccess: () => {
+      toast.success("Successfully registered", {
+        position: "top-right",
+        dismissible: true,
+      });
+      form.clearErrors();
+      form.reset();
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
-    onError: (value: any) => {
-      console.log("error");
+    onError: () => {
+      console.log("something went wrong");
     },
   });
 
   const onSubmit = (values: z.infer<typeof UserSchema>) => {
-    // console.log("hi");
-    // alert(values);
-    // console.log(values);
-    createUser.mutate(values);
-    form.clearErrors();
-    form.reset();
+    createuser.mutate(values);
   };
+
+  useEffect(() => {
+    if (user) {
+      form.setValue("name", user.name);
+      form.setValue("username", user.username);
+      form.setValue("email", user.email);
+      form.setValue("mobile", user.mobile);
+      form.setValue("role_name", user.role_name);
+      form.setValue("password", user.password);
+      form.setValue("status", user.status);
+    }
+  }, [user, form]);
 
   return (
     <div className="w-full h-full">
@@ -125,8 +136,14 @@ const AccountForm = () => {
                           {data.label}
                         </FormLabel>
                         <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}>
+                          value={form.watch(
+                            data.name === "role_name" ? "role_name" : "status"
+                          )}
+                          onValueChange={(value) => {
+                            data.name === "role_name"
+                              ? form.setValue("role_name", value)
+                              : form.setValue("status", value);
+                          }}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue
@@ -143,6 +160,7 @@ const AccountForm = () => {
                             })}
                           </SelectContent>
                         </Select>
+                        <FormMessage />
                       </FormItem>
                     );
                   }}
@@ -161,6 +179,8 @@ const AccountForm = () => {
               onClick={() => {
                 form.clearErrors();
                 form.reset();
+                form.setValue("role_name", "");
+                form.setValue("status", "");
               }}>
               Clear
               <IoMdCloseCircle className="ml-2 text-black" size={20} />

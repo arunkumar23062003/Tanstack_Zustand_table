@@ -14,6 +14,8 @@ import { columns } from "./column";
 import { userController } from "@/config/const";
 import { useQuery } from "@tanstack/react-query";
 import { MdFreeBreakfast } from "react-icons/md";
+import axios from "axios";
+import { useEffect } from "react";
 
 const columnHelper = createColumnHelper<tData>();
 
@@ -59,11 +61,11 @@ const AccountList = () => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      return fetchUsers();
+      const response = await axios.get("/api/register");
+      return response.data;
     },
   });
   const breaks: tData[] | undefined = data;
-  // console.log(breaks);
 
   if (isLoading && breaks === undefined) {
     return <div>Loading</div>;
@@ -72,6 +74,7 @@ const AccountList = () => {
   if (isError) {
     return <div>Error</div>;
   }
+
   return (
     // <table className="">
     //   <thead>

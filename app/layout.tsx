@@ -4,6 +4,7 @@ import "./globals.css";
 import Topnavbar from "@/components/navbar/topnavbar";
 import SideNavbar from "@/components/navbar/sidenavbar";
 import Provider from "@/query-client/provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,6 +33,7 @@ export default function RootLayout({
             </div>
           </div>
         </Provider>
+        <Toaster position="top-right" />
       </body>
     </html>
   );

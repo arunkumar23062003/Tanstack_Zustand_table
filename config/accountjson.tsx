@@ -41,7 +41,12 @@ export const AccountFormJSON = [
   },
 ];
 
-export const AccountFormSelectJSON = [
+export const AccountFormSelectJSON: {
+  name: string;
+  label: string;
+  placeholder: string;
+  content: { name: string; value: string }[];
+}[] = [
   {
     name: "role_name",
     label: "Role",
